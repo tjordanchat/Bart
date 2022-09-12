@@ -1,0 +1,63 @@
+#!/bin/bash
+set -v -x -e
+
+###################################
+----- DEFINE VARIABLES
+###################################
+
+export CRUMB=''
+export MYHOME="$(pwd)"
+export DISPLAY=':99'
+export TZ='America/New_York'
+export JENKINS_HOME=/var/lib/jenkins
+export PATH=$PATH:/usr/lib/jvm/java-8-openjdk-amd64/jre/bin
+export PATH=$PATH:/snap/bin
+export TRAVIS_BUILD_DIR=${TRAVIS_BUILD_DIR:-`pwd`}
+
+----- () {
+    printf "\e[32m"
+    toilet -f term -F border  $@
+    printf "\e[0m"
+}
+
+Install_Toilet () {
+  sudo apt-get -f install
+  sudo apt-get update -y 2>/dev/null
+  sudo apt-get install -y toilet toilet-fonts
+  sudo apt-get -f install figlet -y
+  ls -la /usr/share/figlet
+}
+
+Install_Java () {
+   ----- INSTALL JAVA
+   sudo apt-get -f -y install  openjdk-8-jre-headless
+}
+
+Install_Docker () {
+   ----- INSTALL DOCKER
+   sudo apt install apt-transport-https ca-certificates curl software-properties-common
+   curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+   sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
+   apt-cache policy docker-ce
+   sudo apt install docker-ce -y
+   sudo systemctl status docker | cat
+   sudo docker run hello-world
+}
+
+Install_Jenkins () {
+   ----- INSTALL JENKINS
+   cd $MYHOME
+   wget http://mirrors.jenkins.io/war-stable/latest/jenkins.war 2> /dev/null > /dev/null
+   wget -q -O - https://pkg.jenkins.io/debian/jenkins-ci.org.key | sudo apt-key add -
+   sudo sh -c 'echo deb http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
+   sudo apt-get update
+   sudo apt-get -y --allow-unauthenticated install jenkins
+   sudo apt-get install -y xsltproc
+   sudo xsltproc -o $JENKINS_HOME/config.xml remove_elements.xsl $JENKINS_HOME/config.xml
+   sudo cat /var/lib/jenkins/config.xml
+   sudo find $JENKINS_HOME -ls
+}
+
+Install_Toilet
+
+
