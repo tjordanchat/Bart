@@ -1,7 +1,7 @@
 sudo: true
 language: go
 script:
-- curl https://raw.githubusercontent.com/tjordanchat/Bart/master/test.sh
+- curl https://raw.githubusercontent.com/tjordanchat/Bart/master/init
   | bash
 - echo Done
 before_deploy:
