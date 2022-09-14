@@ -1,0 +1,1 @@
+sudo java -Djenkins.install.runSetupWizard=false -jar jenkins.war
