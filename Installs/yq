@@ -1,3 +1,0 @@
-sudo add-apt-repository ppa:rmescandon/yq
-sudo apt install yq -y || sudo pip install yq
-

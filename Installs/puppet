@@ -1,5 +1,0 @@
-   sudo wget https://apt.puppetlabs.com/puppetlabs-release-trusty.deb
-   sudo dpkg --force-all -i puppetlabs-release-trusty.deb
-   sudo apt-get -f -y install  puppetmaster
-   sudo apt-get -f -y install  puppet
-

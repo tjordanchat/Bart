@@ -1,2 +1,0 @@
-sudo apt-get -f -y install imagemagick 2>/dev/null
-
