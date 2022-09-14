@@ -1,31 +1,31 @@
-all: docker go imagemagick java jenkins puppet ruby vars xvfb yq
+all: docker go imagemagick java jenkins puppet ruby vars.o xvfb yq
 
-vars:
-	@cat $@
+vars.o java.o:
+	@cat $*
 	
-docker: vars
+docker: vars.o
 	@cat $@
 
-go: vars
+go: vars.o
 	@cat $@
 
-imagemagick: vars
+imagemagick: vars.o
 	@cat $@
 
-java: vars
+java: vars.o
 	@cat $@
 
-jenkins: vars java
+jenkins: vars.o java.o
 	@cat $@
 
-puppet: vars
+puppet: vars.o
 	@cat $@
 
-ruby: vars
+ruby: vars.o
 	@cat $@
 
-xvfb: vars
+xvfb: vars.o
 	@cat $@
 
-yq: vars
+yq: vars.o
 	@cat $@
