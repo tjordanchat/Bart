@@ -1,22 +1,22 @@
 all: docker go imagemagick java jenkins puppet ruby vars xvfb yq
 
 docker: vars
-	cat $@
+	@cat $@
 go: vars
-	cat $@
+	@cat $@
 imagemagick: vars
-	cat $@
+	@cat $@
 java: vars
-	cat $@
+	@cat $@
 jenkins: vars java
-	cat $@
+	@cat $@
 puppet: vars
-	cat $@
+	@cat $@
 ruby: vars
-	cat $@
+	@cat $@
 vars:
-	cat $@
+	@cat $@
 xvfb: vars
-	cat $@
+	@cat $@
 yq: vars
-	cat $@
+	@cat $@
