@@ -1,0 +1,88 @@
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<flow-definition plugin="workflow-job@2.41">
+  <actions>
+    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobAction plugin="pipeline-model-definition@1.8.5"/>
+    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction plugin="pipeline-model-definition@1.8.5">
+      <jobProperties/>
+      <triggers/>
+      <parameters/>
+      <options/>
+    </org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction>
+  </actions>
+  <description>Seed Job</description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <org.jenkinsci.plugins.workflow.job.properties.DisableConcurrentBuildsJobProperty/>
+    <org.jenkinsci.plugins.workflow.job.properties.DisableResumeJobProperty/>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>URL</name>
+          <description>The git url of the project to build</description>
+          <defaultValue>https://github.com/tjordanchat/eag.git</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.92">
+    <script>export JAVA_OPTS=&quot;-Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=4000,suspend=y&quot;
+url=&quot;&quot;
+binding.variables.each {
+   if ( &quot;${it.key}&quot; == &quot;URL&quot; ) {
+      url=&quot;${it.value}&quot;
+   }
+}
+
+pipelineJob(&apos;Pipeline&apos;) {
+    description &apos;Build and test the app.&apos;
+    scm {
+        github &quot;&apos;&quot;+url+&quot;&apos;&quot;
+    }
+    triggers {
+        scm(&apos;H/15 * * * *&apos;)
+    }
+    definition {
+       cps {
+          sandbox()
+          script(&quot;&quot;&quot;
+node {
+    currentBuild.result = &quot;SUCCESS&quot;
+    sh &apos;date&apos;
+
+    try {
+
+       stage &apos;Pull Sourse Code&apos;
+         
+            echo &apos;Pull Source Code&apos;
+            git url: &apos;${url}&apos;
+       
+       stage &apos;Parse Message&apos;
+
+            def commit = sh(script: &apos;git rev-parse HEAD&apos;, returnStdout: true)
+            def message = sh(script: &apos;git log --format=%B -n 1 \${commit}&apos;, returnStdout: true)
+            def author = sh(script: &apos;git --no-pager show -s --format=&quot;%ae&quot; \${commit}&apos;, returnStdout: true)
+            def items = message.findAll(/[A-Z]{2,10}-[0-9]+/).unique()
+            def env = sh(script: &apos;yq .env &lt; build.yml&apos;, returnStdout: true)
+       
+       stage &apos;Generate Dockerfile&apos;
+        
+            echo &apos;Generate Dockerfile&apos;
+            sh &apos;pwd; ls -l&apos;
+    }
+}
+          &quot;&quot;&quot;) 
+       }
+    }
+}
+</script>
+    <sandbox>false</sandbox>
+  </definition>
+  <triggers/>
+  <authToken>Phoenix</authToken>
+  <disabled>false</disabled>
+</flow-definition>
+
+
