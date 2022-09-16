@@ -1,0 +1,50 @@
+export JAVA_OPTS="-Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=4000,suspend=y"
+url=""
+binding.variables.each {
+   if ( "${it.key}" == "URL" ) {
+      url="${it.value}"
+   }
+}
+
+pipelineJob('Pipeline') {
+    description 'Build and test the app.'
+    scm {
+        github "'"+url+"'"
+    }
+    triggers {
+        scm('H/15 * * * *')
+    }
+    definition {
+       cps {
+          sandbox()
+          script("""
+node {
+    currentBuild.result = "SUCCESS"
+    sh 'date'
+
+    try {
+
+       stage 'Pull Sourse Code'
+         
+            echo 'Pull Source Code'
+            git url: '${url}'
+       
+       stage 'Parse Message'
+
+            def commit = sh(script: 'git rev-parse HEAD', returnStdout: true)
+            def message = sh(script: 'git log --format=%B -n 1 \${commit}', returnStdout: true)
+            def author = sh(script: 'git --no-pager show -s --format="%ae" \${commit}', returnStdout: true)
+            def items = message.findAll(/[A-Z]{2,10}-[0-9]+/).unique()
+            def env = sh(script: 'yq .env < build.yml', returnStdout: true)
+       
+       stage 'Generate Dockerfile'
+        
+            echo 'Generate Dockerfile'
+            sh 'pwd; ls -l'
+    }
+}
+          """) 
+       }
+    }
+}
+
